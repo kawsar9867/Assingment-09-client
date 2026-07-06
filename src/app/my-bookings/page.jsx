@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from "react";
-import { AuthContext } from "@/firebase/AuthProvider";
+import { AuthContext } from "@/context/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,7 +30,7 @@ function MyBookingsContent() {
   const fetchMyBookings = () => {
     setLoading(true);
     const token = localStorage.getItem("tutorsphere_token");
-    fetch(`http://localhost:5000/bookings?email=${user.email}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/bookings?email=${user.email}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -56,7 +56,7 @@ function MyBookingsContent() {
     const token = localStorage.getItem("tutorsphere_token");
 
     try {
-      const res = await fetch(`http://localhost:5000/bookings/${selectedBooking._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/bookings/${selectedBooking._id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useContext } from "react";
-import { AuthContext } from "@/firebase/AuthProvider";
+import { AuthContext } from "@/context/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -63,7 +63,7 @@ function MyTutorsContent() {
   const fetchMyTutors = () => {
     setLoading(true);
     const token = localStorage.getItem("tutorsphere_token");
-    fetch(`http://localhost:5000/my-tutors?email=${user.email}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/my-tutors?email=${user.email}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -116,7 +116,7 @@ function MyTutorsContent() {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/tutors/${selectedTutor._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/tutors/${selectedTutor._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -147,7 +147,7 @@ function MyTutorsContent() {
     const token = localStorage.getItem("tutorsphere_token");
 
     try {
-      const res = await fetch(`http://localhost:5000/tutors/${selectedTutor._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/tutors/${selectedTutor._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

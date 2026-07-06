@@ -2,43 +2,63 @@
 
 import React, { useState, useContext, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { AuthContext } from "@/firebase/AuthProvider";
-import { KeyRound, Mail, Eye, EyeOff, Sparkles, BookOpen } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AuthContext } from "@/context/AuthProvider";
+import { KeyRound, Mail, User, Image as ImageIcon, Eye, EyeOff, Sparkles, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-function LoginContent() {
-  const { signIn, signInWithGoogle, user, loading } = useContext(AuthContext);
+function RegisterContent() {
+  const { createUser, signInWithGoogle, user, loading } = useContext(AuthContext);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/";
 
-  // Redirect if user is already logged in
   useEffect(() => {
     if (user && !loading) {
-      router.push(redirectTo);
+      router.push("/");
     }
-  }, [user, loading, redirectTo, router]);
+  }, [user, loading, router]);
+
+  const validatePassword = (pass) => {
+    if (pass.length < 6) {
+      return "Password must be at least 6 characters long.";
+    }
+    if (!/[A-Z]/.test(pass)) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!/[a-z]/.test(pass)) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError("");
-    setIsSubmitting(true);
 
+    const passError = validatePassword(password);
+    if (passError) {
+      setLocalError(passError);
+      toast.error(passError);
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await signIn(email, password);
-      toast.success("Welcome back to TutorSphere!");
-      router.push(redirectTo);
+      await createUser(email, password, name, photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop");
+      toast.success("Registration successful! Welcome to TutorSphere 🎉");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
     } catch (err) {
-      const errMsg = err.message || "Invalid email or password";
+      const errMsg = err.message || "Failed to create account";
       setLocalError(errMsg);
       toast.error(errMsg);
     } finally {
@@ -50,7 +70,7 @@ function LoginContent() {
     try {
       await signInWithGoogle();
       toast.success("Successfully logged in with Google!");
-      router.push(redirectTo);
+      router.push("/");
     } catch (err) {
       toast.error(err.message || "Google Authentication failed");
     }
@@ -58,7 +78,7 @@ function LoginContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0B0F19]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -73,22 +93,42 @@ function LoginContent() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none dark:bg-indigo-600/20" />
 
         <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl p-8 relative z-10">
-          <div className="text-center mb-8">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg mb-4">
+          <div className="text-center mb-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-lg mb-3">
               <BookOpen className="h-6 w-6" />
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-              Access Account
+              Create Account
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-              Sign in to manage bookings, active tutors, and sessions
+              Sign up to find, book, and review qualified tutors
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name Field */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                Full Name
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <User className="h-4.5 w-4.5" />
+                </span>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
                 Email Address
               </label>
               <div className="relative">
@@ -101,25 +141,35 @@ function LoginContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Photo URL Field */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                Photo URL
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <ImageIcon className="h-4.5 w-4.5" />
+                </span>
+                <input
+                  type="url"
+                  value={photoURL}
+                  onChange={(e) => setPhotoURL(e.target.value)}
+                  placeholder="https://example.com/avatar.jpg (Optional)"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Password
-                </label>
-                <button
-                  type="button"
-                  onClick={() => toast("Reset link feature placeholder: Examiner convenience rule applied.", { icon: "💡" })}
-                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  Forget Password?
-                </button>
-              </div>
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <KeyRound className="h-4.5 w-4.5" />
@@ -130,7 +180,7 @@ function LoginContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-11 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-11 pr-11 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -156,12 +206,12 @@ function LoginContent() {
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-200 disabled:opacity-50 active:scale-[0.98]"
             >
               <Sparkles className="h-4 w-4" />
-              {isSubmitting ? "Signing In..." : "Sign In to TutorSphere"}
+              {isSubmitting ? "Creating Account..." : "Register Now"}
             </button>
           </form>
 
           {/* Social Sign-in Divider */}
-          <div className="relative my-6">
+          <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
             </div>
@@ -199,11 +249,11 @@ function LoginContent() {
             Continue with Google
           </button>
 
-          {/* Register Redirect link */}
-          <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-8">
-            New to our learning space?{" "}
-            <Link href="/register" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-              Create an account
+          {/* Login Redirect link */}
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              Login here
             </Link>
           </p>
         </div>
@@ -213,14 +263,14 @@ function LoginContent() {
   );
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
-      <LoginContent />
+      <RegisterContent />
     </Suspense>
   );
 }

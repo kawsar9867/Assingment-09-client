@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AuthContext } from "@/firebase/AuthProvider";
+import { AuthContext } from "@/context/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -35,7 +35,7 @@ function TutorDetailsContent() {
 
   const fetchTutorDetails = () => {
     setLoading(true);
-    fetch(`http://localhost:5000/tutors/${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/tutors/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setTutor(data);
@@ -87,7 +87,7 @@ function TutorDetailsContent() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/bookings", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { AuthContext } from "@/firebase/AuthProvider";
+import { AuthContext } from "@/context/AuthProvider";
 
 export default function PrivateRoute({ children }) {
   const { user, loading } = useContext(AuthContext);

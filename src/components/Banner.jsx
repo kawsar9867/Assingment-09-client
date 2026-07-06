@@ -26,8 +26,7 @@ const bannerData = [
     features: "Flexible Scheduling | Expert Tutors | Affordable Rates",
     buttonText: "Find Tutors Page",
     buttonLink: "/tutors",
-    bgImage:
-      "https://i.ibb.co.com/PGVhRPdK/classmates-studying-together-library.jpg",
+    bgImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1920&q=80",
   },
   {
     id: 2,
@@ -93,14 +92,18 @@ export default function HeroBanner() {
             className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl transition-all duration-300"
           >
             <div className="absolute inset-0 z-0">
-              <Image
-                src={slide.bgImage}
-                alt={slide.title}
-                fill
-                priority={index === 0}
-                className="object-cover"
-                sizes="(max-width: 1440px) 100vw, 1440px"
-              />
+              {slide.bgImage ? (
+                <Image
+                  src={slide.bgImage}
+                  alt={slide.title}
+                  fill
+                  priority={index === 0}
+                  className="object-cover"
+                  sizes="(max-width: 1440px) 100vw, 1440px"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-tr from-slate-900 via-blue-950 to-indigo-950" />
+              )}
               <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
             </div>
 
@@ -127,61 +130,6 @@ export default function HeroBanner() {
           </SwiperSlide>
         ))}
       </Swiper>
-
-      <style jsx global>{`
-        .swiper-button-next,
-        .swiper-button-prev {
-          color: #2b7a9b !important;
-          background: rgba(255, 255, 255, 0.9);
-          width: 45px !important;
-          height: 45px !important;
-          border-radius: 50%;
-          box-shadow: 0 4px 10px rgb(0 0 0 / 0.15);
-          z-index: 20;
-        }
-
-        .swiper-button-prev {
-          left: 20px !important;
-        }
-        .swiper-button-next {
-          right: 20px !important;
-        }
-
-        .swiper-button-next:after,
-        .swiper-button-prev:after {
-          font-size: 16px !important;
-          font-weight: bold;
-        }
-
-        .swiper-button-disabled {
-          opacity: 0.35;
-          cursor: not-allowed;
-        }
-
-        .swiper-pagination-bullet-active {
-          background: #2b7a9b !important;
-          width: 24px !important;
-          border-radius: 4px !important;
-        }
-
-        .swiper-slide {
-          opacity: 0.4;
-          transform: scale(0.85);
-          transition:
-            opacity 0.4s ease,
-            transform 0.4s ease;
-        }
-
-        .swiper-slide-active {
-          opacity: 1 !important;
-          transform: scale(1) !important;
-        }
-
-        .swiper-slide-next,
-        .swiper-slide-prev {
-          opacity: 0.6;
-        }
-      `}</style>
     </div>
   );
 }

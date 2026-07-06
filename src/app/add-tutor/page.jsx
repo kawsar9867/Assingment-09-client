@@ -2,7 +2,7 @@
 
 import React, { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "@/firebase/AuthProvider";
+import { AuthContext } from "@/context/AuthProvider";
 import PrivateRoute from "@/components/PrivateRoute";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -88,7 +88,7 @@ function AddTutorForm() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/tutors", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/tutors`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -37,7 +37,7 @@ function TutorsContent() {
     if (sd) params.append("startDate", sd);
     if (ed) params.append("endDate", ed);
 
-    fetch(`http://localhost:5000/tutors?${params.toString()}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/tutors?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setTutors(Array.isArray(data) ? data : []);
