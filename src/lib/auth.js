@@ -6,7 +6,18 @@ const client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:2
 const db = client.db("tutorSphereDB");
 
 export const auth = betterAuth({
-    baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.CLIENT_URI || "http://localhost:3000",
+    baseURL: {
+        allowedHosts: [
+            "localhost:3000",
+            "localhost:3001",
+            "localhost:3002",
+            "tutor-booking-system-blond.vercel.app"
+        ],
+        protocol: process.env.NODE_ENV === "development" ? "http" : "https",
+    },
+    advanced: {
+        trustedProxyHeaders: true,
+    },
     user: {
         additionalFields: {
             role: {
