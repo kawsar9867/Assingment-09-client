@@ -8,6 +8,7 @@ import { KeyRound, Mail, Eye, EyeOff, Sparkles, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { authClient } from "@/lib/auth-client";
 
 function LoginContent() {
   const { signIn, signInWithGoogle, user, loading } = useContext(AuthContext);
@@ -16,7 +17,7 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = "/";
@@ -49,8 +50,9 @@ function LoginContent() {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithGoogle();
-      toast.success("Successfully logged in with Google!");
+      await authClient.signIn.social({
+        provider: "google",
+      });
       router.push(redirectTo);
     } catch (err) {
       toast.error(err.message || "Google Authentication failed");
@@ -115,7 +117,12 @@ function LoginContent() {
                 </label>
                 <button
                   type="button"
-                  onClick={() => toast("Reset link feature placeholder: Client config rule applied.", { icon: "💡" })}
+                  onClick={() =>
+                    toast(
+                      "Reset link feature placeholder: Client config rule applied.",
+                      { icon: "💡" },
+                    )
+                  }
                   className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                 >
                   Forget Password?
@@ -138,7 +145,9 @@ function LoginContent() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
-                  {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                  {showPassword ?
+                    <EyeOff className="h-4.5 w-4.5" />
+                  : <Eye className="h-4.5 w-4.5" />}
                 </button>
               </div>
             </div>
@@ -203,7 +212,10 @@ function LoginContent() {
           {/* Register Redirect link */}
           <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-8">
             New to our learning space?{" "}
-            <Link href="/register" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+            <Link
+              href="/register"
+              className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            >
               Create an account
             </Link>
           </p>
@@ -216,11 +228,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );
